@@ -9,13 +9,6 @@ import { WarOptions } from "../types/WarOptions"
 
 let io: SocketIoServer | null = null
 
-const war_options: WarOptions = {
-    quadrant_size: 500,
-    units: 10,
-    io,
-}
-const war = new War(war_options)
-
 export const initializeIoServer = (server: HttpServer | HttpsServer) => {
     io = new SocketIoServer(server, {
         cors: { origin: "*" },
@@ -29,8 +22,15 @@ export const getIoInstance = () => {
     }
     return io
 }
+const war_options: WarOptions = {
+    quadrant_size: 500,
+    units: 10,
+}
+const war = new War(war_options)
 
 export const handleSocket = (socket: Socket) => {
+    war.start()
+
     console.log(`new connection: ${socket.id}`)
 
     socket.on("disconnect", () => {

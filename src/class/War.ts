@@ -1,20 +1,18 @@
 import { Server } from "socket.io"
 import { WarOptions } from "../types/WarOptions"
 import { Team } from "./Team"
+import { getIoInstance } from "../io/socket"
 
 export class War {
     teams: Team[] = []
     loop: NodeJS.Timer | null = null
-    io: Server | null
 
     quadrant_size: number
     units: number
 
     constructor(data: WarOptions) {
-        this.io = data.io
         this.quadrant_size = data.quadrant_size
         this.units = data.units
-        
     }
 
     start() {
@@ -33,11 +31,13 @@ export class War {
     }
 
     stop() {
+        this.loop && clearInterval(this.loop)
         this.loop = null
         this.teams = []
     }
 
     sync() {
-        this.io?.emit("war:sync", this.teams)
+        const io = getIoInstance()
+        io.emit("war:sync", this.teams)
     }
 }
